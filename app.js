@@ -46,7 +46,7 @@
 //     }
 // }
 
-document.getElementById('search-btn').addEventListener('click', buscarPokemon);
+// document.getElementById('search-btn').addEventListener('click', buscarPokemon);
 
 
 /**
@@ -98,20 +98,57 @@ document.getElementById('search-btn').addEventListener('click', buscarPokemon);
  * Ejercicio 3: buscar pokemon con JQuery AJAX.
  */
 
-function buscarPokemonJQueryAJAX(){
-    /**
-     * Tu código aquí.
-     */
+function buscarPokemonJQueryAJAX() {
+    const input = $('#pokemon-input');
+    const resultSection = $('#result-section');
+    const pokemonData = $('#pokemon-data');
+
+    const nombre = input.val().trim().toLowerCase();
+
+    if (!nombre) {
+        pokemonData.html('<p style="color: #ff6347;">Por favor, introduce un nombre de Pokémon.</p>');
+        resultSection.removeClass('hidden');
+        return;
+    }
+
+    $.ajax({
+        url: `https://pokeapi.co/api/v2/pokemon/${nombre}`,
+        method: 'GET',
+        dataType: 'json',
+        success: function(data) {
+            const name = data.name.charAt(0).toUpperCase() + data.name.slice(1);
+            const id = data.id;
+            const sprite = data.sprites.front_default;
+
+            // Guardar en variables globales para usar luego en agregarAColeccion
+            pokemonActualNombre = name;
+            pokemonActualSprite = sprite;
+
+            pokemonData.html(`
+                <div class="pokemon-card">
+                    <h3>${name} #${id}</h3>
+                    <img src="${sprite}" alt="${name}">
+                    <button id="add-to-collection-btn" class="btn-style">Agregar a la colección</button>
+                </div>
+            `);
+            resultSection.removeClass('hidden');
+
+            // Event listener para el botón "Agregar a la colección"
+            $('#add-to-collection-btn').on('click', agregarAColeccion);
+        },
+        error: function() {
+            pokemonData.html('<p style="color: #ff6347;">Pokémon no encontrado</p>');
+            resultSection.removeClass('hidden');
+        }
+    });
 }
 
 /**
  * Haciendo uso de JQuery, descomentar para usar la función buscarPokemonJQueryAJAX
 */
-/**
 $(document).ready(function(){
     $('#search-btn').on('click', buscarPokemonJQueryAJAX);
 });
-*/
 
 
 /**
